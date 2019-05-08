@@ -38,6 +38,11 @@ public class UserRestController {
 		System.out.println(this.getClass());
 	}
 
+	@Value("#{commonProperties['pageUnit']}")
+	int pageUnit;
+	@Value("#{commonProperties['pageSize']}")
+	int pageSize;
+
 	@RequestMapping(value = "json/getUser/{userId}", method = RequestMethod.GET)
 	public User getUser(@PathVariable String userId) throws Exception {
 
@@ -100,28 +105,47 @@ public class UserRestController {
 		return map;
 	}
 
-	@RequestMapping(value = "json/listUser")
-	public String listUser(@RequestBody Search search) throws Exception {
+	@RequestMapping(value = "json/listUser/{currentPage}/{pageSize}",method = RequestMethod.GET)
 
-		System.out.println("/user/listUser : GET / POST");
+	public Map listUser(@PathVariable String currentPage, @PathVariable String pageSize ) throws Exception {
 
-		search.setCurrentPage(1);
-		search.setPageSize(3);
+		System.out.println("/user/json/listUser : GET");
 		
+		Search search = new Search();
+		search.setCurrentPage(Integer.parseInt(currentPage));
+		search.setPageSize(Integer.parseInt(pageSize));
+		
+		Map<String, Object> map = userService.getUserList(search);
 
-		// Business logic 수행
+		Page resultPage = new Page(search.getCurrentPage(), ((Integer) map.get("totalCount")).intValue(), pageUnit,
+				search.getPageSize());
+		
+		System.out.println(resultPage);
+
+		map.put("list", map.get("list"));
+		map.put("resultPage", resultPage);
+		map.put("search", search);
+
+		return map;
+	}
+	
+	@RequestMapping(value = "json/listUser", method = RequestMethod.POST)
+
+	public Map listUser(@RequestBody Search search) throws Exception {
+
+		System.out.println("/user/json/listUser : POST");
+
 		Map<String, Object> map = userService.getUserList(search);
 
 		Page resultPage = new Page(search.getCurrentPage(), ((Integer) map.get("totalCount")).intValue(), pageUnit,
 				pageSize);
 		System.out.println(resultPage);
 
-		// Model 과 View 연결
-		model.addAttribute("list", map.get("list"));
-		model.addAttribute("resultPage", resultPage);
-		model.addAttribute("search", search);
+		map.put("list", map.get("list"));
+		map.put("resultPage", resultPage);
+		map.put("search", search);
 
-		return "forward:/user/listUser.jsp";
+		return map;
 	}
 
 }
