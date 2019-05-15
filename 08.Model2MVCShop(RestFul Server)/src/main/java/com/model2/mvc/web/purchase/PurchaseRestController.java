@@ -1,4 +1,4 @@
-package com.model2.mvc.web.product;
+package com.model2.mvc.web.purchase;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +28,7 @@ import com.model2.mvc.service.user.UserService;
 //==> 회원관리 RestController
 @RestController
 @RequestMapping("/product/*")
-public class ProductRestController {
+public class PurchaseRestController {
 
 	/// Field
 	@Autowired
@@ -36,7 +36,7 @@ public class ProductRestController {
 	private ProductService productService;
 	// setter Method 구현 않음
 
-	public ProductRestController() {
+	public PurchaseRestController() {
 		System.out.println(this.getClass());
 	}
 
